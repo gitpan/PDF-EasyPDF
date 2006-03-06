@@ -5,7 +5,9 @@ use warnings;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(inch mm);
-our $VERSION = 0.03;
+our $VERSION = 0.04;
+
+use utf8;
 
 =head1 NAME
 
@@ -21,11 +23,11 @@ $pdf->setStrokeColor("CC0000");
 
 $pdf->setStrokeWidth(8);
 
-$pdf->Rectangle(mm(10),mm(10),mm(297-20),mm(210-20));
+$pdf->rectangle(mm(10),mm(10),mm(297-20),mm(210-20));
 
 $pdf->setFillColor("FFCC00");
 
-$pdf->FilledRectangle(mm(20),mm(20),mm(297-40),mm(210-40));
+$pdf->filledRectangle(mm(20),mm(20),mm(297-40),mm(210-40));
 
 $pdf->setFillColor("CC0000");
 
@@ -33,21 +35,21 @@ $pdf->setFontFamily("Helvetica-Bold");
 
 $pdf->setFontSize(24);
 
-$pdf->Text(mm(105),mm(210-22.5),"PDF::EasyPDF Demo");
+$pdf->text(mm(105),mm(210-22.5),"PDF::EasyPDF Demo");
 
-$pdf->Lines(mm(85),mm(35),mm(90),mm(105),mm(95),mm(35),mm(100),mm(105),mm(105),mm(35),mm(110),mm(105));
+$pdf->lines(mm(85),mm(35),mm(90),mm(105),mm(95),mm(35),mm(100),mm(105),mm(105),mm(35),mm(110),mm(105));
 
 $pdf->setStrokeColor("000099");
 
-$pdf->Curve(300,300,300,400,400,400,400,300);
+$pdf->curve(300,300,300,400,400,400,400,300);
 
 $pdf->setStrokeColor("0066FF");
 
 $pdf->setFillColor("00FFFF");
 
-$pdf->Polygon(100,100,250,200,250,400,200,500);
+$pdf->polygon(100,100,250,200,250,400,200,500);
 
-$pdf->FilledPolygon(100,100,250,200,250,400,200,500);
+$pdf->filledPolygon(100,100,250,200,250,400,200,500);
 
 $pdf->close;
 
@@ -450,24 +452,24 @@ sub setJoin
     else
     {$self->{stream} .= "0 j\n"}}
 
-=head2 Text(x,y,string)
+=head2 text(x,y,string)
 
 Places text at x,y
 
 =cut
 
-sub Text
+sub text
 {my $self = shift;
  my ($x,$y,$text) = @_;
  $self->{stream} .="BT\n/$self->{font_name} $self->{font_size} Tf\n$x $y Td\n($text) Tj\nET\n"}
 
-=head2 Lines(x1,y1,x2,y2, ...)
+=head2 lines(x1,y1,x2,y2, ...)
 
 Prints one or more lines, using alternative x and y coordinates.
 
 =cut
 
-sub Lines
+sub lines
 {my $self = shift;
  my $startx = shift;
  my $starty = shift;
@@ -479,13 +481,13 @@ sub Lines
     $self->{stream} .= "$nextx $nexty l\n"};
  $self->{stream} .= "S\n"}
 
-=head2 Polygon(x1,y1,x2,y2, ...)
+=head2 polygon(x1,y1,x2,y2, ...)
 
 Prints a closed, unfilled polygon using alternative x and y coordinates.
 
 =cut
 
-sub Polygon
+sub polygon
 {my $self = shift;
  my $startx = shift;
  my $starty = shift;
@@ -497,13 +499,13 @@ sub Polygon
     $self->{stream} .= "$nextx $nexty l\n"};
  $self->{stream} .= "h\nS\n"}
 
-=head2 FilledPolygon(x1,y1,x2,y2, ...)
+=head2 filledPolygon(x1,y1,x2,y2, ...)
 
 Prints a closed, filled polygon with no border using alternative x and y coordinates.
 
 =cut
 
-sub FilledPolygon
+sub filledPolygon
 {my $self = shift;
  my $startx = shift;
  my $starty = shift;
@@ -515,82 +517,154 @@ sub FilledPolygon
     $self->{stream} .= "$nextx $nexty l\n"};
  $self->{stream} .= "h\nf\n"}
 
-=head2 Curve(x1,y1,x2,y2,x3,y3,x4,y4)
+=head2 curve(x1,y1,x2,y2,x3,y3,x4,y4)
 
 Prints a bezier curve.
 
 =cut
 
-sub Curve
+sub curve
 {my $self = shift;
  my $startx = shift;
  my $starty = shift;
  $self->{stream} .= "$startx $starty m\n$_[0] $_[1] $_[2] $_[3] $_[4] $_[5] c\nS\n"}
 
-=head2 FilledCurve(x1,y1,x2,y2,x3,y3,x4,y4)
+=head2 filledCurve(x1,y1,x2,y2,x3,y3,x4,y4)
 
 Prints a filled bezier curve without a border.
 
 =cut
 
-sub FilledCurve
+sub filledCurve
 {my $self = shift;
  my $startx = shift;
  my $starty = shift;
  $self->{stream} .= "$startx $starty m\n$_[0] $_[1] $_[2] $_[3] $_[4] $_[5] c\nh\nf\n"}
 
-=head2 ClosedCurve(x1,y1,x2,y2,x3,y3,x4,y4)
+=head2 closedCurve(x1,y1,x2,y2,x3,y3,x4,y4)
 
 Prints an unfilled bezier curve, with the first and last points joined by a straight line.
 
 =cut
 
-sub ClosedCurve
+sub closedCurve
 {my $self = shift;
  my $startx = shift;
  my $starty = shift;
  $self->{stream} .= "$startx $starty m\n$_[0] $_[1] $_[2] $_[3] $_[4] $_[5] c\nh\nS\n"}
 
-sub CurveStart
-{my $self = shift;
- my $startx = shift;
- my $starty = shift;
- $self->{stream} .= "$startx $starty m\n$_[0] $_[1] $_[2] $_[3] $_[4] $_[5] c\n"}
+=head2 moveSegment(x,y)
 
-sub CurveMiddle
+Inserts a move operation (use to start new paths)
+
+=cut
+
+sub moveSegment
+{my $self = shift;
+ my $x = shift;
+ my $y = shift;
+ $self->{stream} .= "$x $y m\n"}
+
+=head2 lineSegment(x,y)
+
+Inserts a line segment
+
+=cut
+
+sub lineSegment
+{my $self = shift;
+ my $x = shift;
+ my $y = shift;
+ $self->{stream} .= "$x $y l\n"}
+
+=head2 curveSegment(x,y)
+
+Inserts a curve segment
+
+=cut
+
+sub curveSegment
 {my $self = shift;
  $self->{stream} .= "$_[0] $_[1] $_[2] $_[3] $_[4] $_[5] c\n"}
 
-sub CurveEnd
-{my $self = shift;
- $self->{stream} .= "$_[0] $_[1] $_[2] $_[3] $_[4] $_[5] c\nS\n"}
+=head2 closePath()
 
-sub FilledCurveEnd
-{my $self = shift;
- $self->{stream} .= "$_[0] $_[1] $_[2] $_[3] $_[4] $_[5] c\nh\nf\n"}
+Closes a path
 
-sub ClosedCurveEnd
-{my $self = shift;
- $self->{stream} .= "$_[0] $_[1] $_[2] $_[3] $_[4] $_[5] c\nh\nS\n"}
+=cut
 
-=head2 Rectangle(x1,y1,xsize,ysize)
+sub closePath
+{my $self = shift;
+ $self->{stream} .= "h\n"}
+
+=head2 strokePath()
+
+Strokes the path
+
+=cut
+
+sub strokePath
+{my $self = shift;
+ $self->{stream} .= "S\n"}
+
+=head2 fillPath()
+
+Fills the path using the non-zero winding number rule
+
+=cut
+
+sub fillPath
+{my $self = shift;
+ $self->{stream} .= "f\n"}
+
+=head2 fillStarPath()
+
+Fills the path using the odd-even winding rule (f*, hence the 'star')
+
+=cut
+
+sub fillStarPath
+{my $self = shift;
+ $self->{stream} .= "f*\n"}
+
+=head2 fillAndStrokePath()
+
+Fills the path using the non-zero winding number rule and then strokes it
+
+=cut
+
+sub fillAndStrokePath
+{my $self = shift;
+ $self->{stream} .= "B\n"}
+
+=head2 fillStarAndStrokePath()
+
+Fills the path using the odd-even winding rule and then fills it (B*, hence the 'star')
+
+=cut
+
+sub fillStarAndStrokePath
+{my $self = shift;
+ $self->{stream} .= "B*\n"}
+
+=head2 rectangle(x1,y1,xsize,ysize)
 
 Prints an unfilled rectangle.
 
 =cut
 
-sub Rectangle
+sub rectangle
 {my $self = shift;
  my ($x,$y,$dx,$dy) = @_;
  $self->{stream} .="$x $y $dx $dy re\nS\n"}
 
-=head2 Filled Rectangle(x1,y1,xsize,ysize)
+=head2 filledRectangle(x1,y1,xsize,ysize)
 
 Prints a filled rectangle with no border.
 
 =cut
 
-sub FilledRectangle
+sub filledRectangle
 {my $self = shift;
  my ($x,$y,$dx,$dy) = @_;
  $self->{stream} .="$x $y $dx $dy re\nF\n"}
@@ -623,10 +697,11 @@ None known, but the methods do relatively little sanity checking, and there is a
 
 =head1 COMING SOON
 
-A first stab at encoding text, methods for building paths containing straight lines, curves and moves, maybe cliping paths.
+A first stab at encoding text, arrowheads.
 
 =head1 PREVIOUS VERSIONS
 
+B<0.04>: Consistent capitalisation of methods, generic arbitrary path drawing mechanism.
 B<0.03>: Beat module into something approaching standard CPAN shape.
 
 =head1 COPYRIGHT AND LICENSE
